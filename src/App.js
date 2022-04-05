@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import {connect} from "react-redux";
+import {fetchUser} from "./actions";
 
-function App() {
+function App(props) {
+  const {users, error, isFetching, dispatchFetchUser} = props
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {users ? (
+          <div>
+            <span style={{fontWeight: 'bold'}}>List Users</span>
+            <ul>
+              {users.map(user => <li key={user.id}>{user.name}</li>)}
+            </ul>
+          </div>
+      ) : (
+          <span>No User</span>
+      )}
+      {isFetching ? (
+          <button disabled>Fetching</button>
+      ) : (
+          <button onClick={() => dispatchFetchUser()}>Fetch Users</button>
+      )}
+      {error && <span style={{color: 'red'}}>Something went wrong!</span>}
     </div>
   );
 }
 
-export default App;
+const mapStateToProps = state => ({
+  users: state.users,
+  error: state.error,
+  isFetching: state.isFetching
+})
+
+const mapDispatchToProps = dispatch => ({
+  dispatchFetchUser: () => dispatch(fetchUser())
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
